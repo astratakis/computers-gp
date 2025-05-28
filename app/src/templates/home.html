@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+{% include 'header.html' %}
+
+<body>
+  <script src="{{ url_for('static', filename='dist/js/demo-theme.min.js') }}"></script>
+  <div class="page">
+    <!-- Navbar -->
+    {% set active_page = 'home' %}
+    {% include 'navbar.html' %}
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <!-- Page pre-title -->
+              <div class="page-pretitle">
+                Overview
+              </div>
+              <h2 class="page-title">
+                Dashboard
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+          <!-- First row: existing cards and charts -->
+          <div class="row row-deck row-cards">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">Currently up for</div>
+                  <div class="h3 m-0">{{ uptime }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">Open Tickets</div>
+                  <div class="h3 m-0">{{ open_tickets_count }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">Open Jobs</div>
+                  <div class="h3 m-0">{{ open_jobs_count }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h3 class="card-title">Traffic summary</h3>
+                  <div id="chart-mentions" class="chart-lg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h3 class="card-title">Total entries</h3>
+                  <div id="chart-demo-pie" class="chart-lg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Second row: additional 3 cards below the ApexCharts with spacing -->
+          <div class="row row-deck row-cards mt-1">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">KEYCLOAK</div>
+                  <!-- Unique ID for the Keycloak card -->
+                  <div id="keycloak-card" class="h3 m-0"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">POSTGRES</div>
+                  <!-- Unique ID for the Postgres card -->
+                  <div id="postgres-card" class="h3 m-0"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="subheader">PGADMIN</div>
+                  <!-- Unique ID for the pgAdmin card -->
+                  <div id="pgadmin-card" class="h3 m-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- end container-xl -->
+      </div> <!-- end page-body -->
+    </div>
+  </div>
+  <!-- Libs JS -->
+  <script src="{{ url_for('static', filename='dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>
+  <!-- Tabler Core -->
+  <script src="{{ url_for('static', filename='dist/js/tabler.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='dist/js/demo.min.js') }}" defer></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      // Update a single card with response time and status
+      function updateCard(elementId, serviceData) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        let timeStr;
+        if (serviceData.active) {
+          timeStr = serviceData.time.toFixed(1) + " ms";
+        }
+        else {
+          timeStr = ""
+        }
+        const statusStr = serviceData.active ?
+          '<span class="status status-green">Up</span>' :
+          '<span class="status status-red">Down</span>';
+        // Use a flex container so time is left and status is right
+        element.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+				<span>${timeStr}</span>
+				<span>${statusStr}</span>
+				</div>`;
+      }
+
+      // Function to fetch and update health data
+      function updateHealthData() {
+        fetch("/api/v1/health/")
+          .then(response => response.json())
+          .then(data => {
+
+            if (data.success) {
+              updateCard("keycloak-card", data.result.keycloak);
+            }
+            if (data.success) {
+              updateCard("postgres-card", data.result.postgres);
+            }
+            if (data.success) {
+              updateCard("pgadmin-card", data.result.pgadmin);
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching health data:", error);
+          });
+      }
+
+      // Initial call and auto-update every 3 seconds (3000ms)
+      updateHealthData();
+      setInterval(updateHealthData, 3000);
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Fetch the chart data from the API endpoint
+      fetch('api/v1/entries/traffic')
+        .then(response => response.json())
+        .then(json => {
+          if (json.success) {
+            const hist = json.result.hist;
+
+            // Determine the most recent date from the dataset
+            const maxDateStr = hist.reduce((max, item) => item.date > max ? item.date : max, hist[0].date);
+            const maxDateObj = new Date(maxDateStr);
+
+            // Calculate the start date: 40 days before the most recent date
+            const startDateObj = new Date(maxDateObj);
+            startDateObj.setDate(startDateObj.getDate() - 40);
+
+            // Generate an array of date strings in "YYYY-MM-DD" format from startDate to maxDate (inclusive)
+            const dates = [];
+            for (let d = new Date(startDateObj); d <= maxDateObj; d.setDate(d.getDate() + 1)) {
+              const year = d.getFullYear();
+              const month = String(d.getMonth() + 1).padStart(2, '0');
+              const day = String(d.getDate()).padStart(2, '0');
+              dates.push(`${year}-${month}-${day}`);
+            }
+
+            // Collect unique networks from the data
+            const networksSet = new Set();
+            hist.forEach(item => networksSet.add(item.network));
+            const networks = Array.from(networksSet);
+
+            // Build series data: for each network, for each date in the 40-day window, set count (defaulting to 0)
+            const series = networks.map(network => ({
+              name: network,
+              data: dates.map(date => {
+                const sum = hist
+                  .filter(item => item.network === network && item.date === date)
+                  .reduce((acc, curr) => acc + curr.count, 0);
+                return sum;
+              })
+            }));
+
+            // Render the ApexCharts bar chart with the generated data and date range
+            new ApexCharts(document.getElementById('chart-mentions'), {
+              chart: {
+                type: "bar",
+                fontFamily: 'inherit',
+                height: 240,
+                parentHeightOffset: 0,
+                toolbar: { show: false },
+                animations: { enabled: false },
+                stacked: true,
+              },
+              plotOptions: {
+                bar: { columnWidth: '50%' }
+              },
+              dataLabels: { enabled: false },
+              fill: { opacity: 1 },
+              series: series,
+              tooltip: { theme: 'dark' },
+              grid: {
+                padding: { top: -20, right: 0, left: -4, bottom: -4 },
+                strokeDashArray: 4,
+                xaxis: { lines: { show: true } }
+              },
+              xaxis: {
+                labels: { padding: 0 },
+                tooltip: { enabled: false },
+                axisBorder: { show: false },
+                type: 'datetime',
+                categories: dates,
+              },
+              yaxis: { labels: { padding: 4 } },
+              colors: ["#848785", "#ff636b", "#a32127", tabler.getColor("blue", 0.8)],
+              legend: { show: false },
+            }).render();
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching chart data:", error);
+        });
+    });
+  </script>
+
+
+  <script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+      window.ApexCharts && (new ApexCharts(document.getElementById('sparkline-activity'), {
+        chart: {
+          type: "radialBar",
+          fontFamily: 'inherit',
+          height: 40,
+          width: 40,
+          animations: {
+            enabled: false
+          },
+          sparkline: {
+            enabled: true
+          },
+        },
+        tooltip: {
+          enabled: false,
+        },
+        plotOptions: {
+          radialBar: {
+            hollow: {
+              margin: 0,
+              size: '75%'
+            },
+            track: {
+              margin: 0
+            },
+            dataLabels: {
+              show: false
+            }
+          }
+        },
+        colors: [tabler.getColor("blue")],
+        series: [35],
+      })).render();
+    });
+    // @formatter:on
+  </script>
+  <script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("/api/v1/computers/classes")
+        .then(response => response.json())
+        .then(data => {
+          const labels = Object.keys(data.result);
+          const series = Object.values(data.result);
+          let colors = [];
+          const colorMapping = {
+            "__A": "#ff636b",
+            "__D": "#848785",
+            "__S": tabler.getColor("blue", 0.8),
+            "__T": "#a32127"
+          };
+          for (let i = 0; i < labels.length; i++) {
+            const label = labels[i];
+            if (colorMapping[label]) {
+              colors.push(colorMapping[label]);
+            } else {
+              colors.push("#000000");
+            }
+          }
+          if (window.ApexCharts) {
+            new ApexCharts(document.getElementById('chart-demo-pie'), {
+              chart: {
+                type: "donut",
+                fontFamily: 'inherit',
+                height: 240,
+                sparkline: {
+                  enabled: true
+                },
+                animations: {
+                  enabled: false
+                },
+              },
+              fill: {
+                opacity: 1,
+              },
+              series: series,
+              labels: labels,
+              tooltip: {
+                theme: 'dark'
+              },
+              grid: {
+                strokeDashArray: 4,
+              },
+              colors: colors,
+              legend: {
+                show: true,
+                position: 'bottom',
+                offsetY: 12,
+                markers: {
+                  width: 10,
+                  height: 10,
+                  radius: 100,
+                },
+                itemMargin: {
+                  horizontal: 8,
+                  vertical: 8
+                },
+              },
+              tooltip: {
+                fillSeriesColor: false
+              },
+            }).render();
+          }
+        })
+        .catch(error => console.error("Error fetching data:", error));
+    });
+    // @formatter:on
+  </script>
+
+  <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+</body>
+
+</html>

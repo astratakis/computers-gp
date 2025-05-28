@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+{% include 'header.html' %}
+
+<body>
+    <script src="{{ url_for('static', filename='dist/js/demo-theme.min.js') }}"></script>
+    <div class="page">
+        <!-- Navbar -->
+        {% set active_page = 'computers' %}
+        {% include 'navbar.html' %}
+        <div class="page-wrapper">
+            <!-- Page header -->
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                New Computer Registration
+                            </h2>
+                        </div>
+                        <div class="col-auto ms-auto d-print-none">
+                            <div class="btn-list">
+                                <a class="btn btn-primary d-none d-sm-inline-block">
+                                    <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M12 5l0 14" />
+                                        <path d="M5 12l14 0" />
+                                    </svg>
+                                    Submit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="card">
+                        <form id="ticket-form">
+                            <div class="card-body">
+
+                                <!-- Row 1: client name, division, office, phone, priority -->
+                                <div class="mb-3">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Operator</label>
+                                            <select id="submitted-by" class="form-select">
+                                                <option value="" selected disabled hidden aria-required="true">Select
+                                                    your name</option>
+                                                {% for operator in operators %}
+                                                <option value="{{ operator.name }}">{{ operator.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <small id="submitted-by-error" class="invalid-feedback"></small>
+                                        </div>
+
+                                        <!-- Client Name -->
+                                        <div class="col-md-2">
+                                            <label class="form-label">Network</label>
+                                            <select id="network" class="form-select">
+                                                <option value="" selected disabled hidden aria-required="true">Select
+                                                    Network</option>
+                                                <option value="__D">__D</option>
+                                                <option value="__A">__A</option>
+                                                <option value="__S">__S</option>
+                                                <option value="__T">__T</option>
+                                            </select>
+                                            <small id="network-error" class="invalid-feedback"></small>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Operating System</label>
+                                            <select id="os" class="form-select">
+                                                <option value="" selected disabled hidden aria-required="true">Select OS
+                                                </option>
+                                                <option value="Windows">Windows</option>
+                                                <option value="Linux">Linux</option>
+                                            </select>
+                                            <small id="os-error" class="invalid-feedback"></small>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Network Adapter</label>
+                                            <select id="adapter" class="form-select">
+                                                <option value="" selected disabled hidden aria-required="true">Select
+                                                    Adapter</option>
+                                                <option value="Ethernet">Ethernet</option>
+                                                <option value="Optical">Optical</option>
+                                            </select>
+                                            <small id="adapter-error" class="invalid-feedback"></small>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Division</label>
+                                                <input type="text" id="division" class="form-control">
+                                                <small id="division-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2">
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">User</label>
+                                                <input type="text" id="user" class="form-control">
+                                                <small id="user-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">YAT</label>
+                                                <input type="text" id="yat" class="form-control">
+                                                <small id="yat-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Office</label>
+                                                <input type="text" id="office" class="form-control">
+                                                <small id="office-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Phone</label>
+                                                <input type="text" id="phone" class="form-control">
+                                                <small id="phone-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2">
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Make</label>
+                                                <input type="text" id="make" class="form-control">
+                                                <small id="make-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Model</label>
+                                                <input type="text" id="model" class="form-control">
+                                                <small id="model-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">PC Serial Number</label>
+                                                <input type="text" id="pc-serial" class="form-control">
+                                                <small id="pc-serial-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Network Adapter Serial Number</label>
+                                                <input type="text" id="net-serial" class="form-control">
+                                                <small id="net-serial-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2">
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Host Name</label>
+                                                <input type="text" id="host-name" class="form-control">
+                                                <small id="host-name-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Mac Address</label>
+                                                <input type="text" id="mac" class="form-control">
+                                                <small id="mac-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">IPv4 Address</label>
+                                                <input type="text" id="ipv4" class="form-control">
+                                                <small id="ipv4-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Security Seal</label>
+                                                <input type="text" id="secseal" class="form-control">
+                                                <small id="secseal-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label class="form-label">Label</label>
+                                                <input type="text" id="label" class="form-control"
+                                                    value="{{ next_label }}">
+                                                <small id="label-error" class="invalid-feedback"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!-- card-body -->
+                        </form>
+                    </div> <!-- card -->
+                </div> <!-- container-xl -->
+            </div> <!-- page-body -->
+        </div> <!-- page-wrapper -->
+    </div> <!-- page -->
+
+    <!-- Tabler Core -->
+    <script src="{{ url_for('static', filename='dist/js/tabler.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='dist/js/demo.min.js') }}" defer></script>
+
+    <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+    <script>
+        // Get references to the select and the input field
+        const networkSelect = document.getElementById('network');
+        const hostNameInput = document.getElementById('host-name');
+        // next_hostname comes from your backend via templating
+        const nextHostname = "{{ next_hostname }}";
+
+        // Add an event listener to update the host name based on the network selection
+        networkSelect.addEventListener('change', function () {
+            if (this.value === '__D') {
+                hostNameInput.value = nextHostname;
+            } else {
+                hostNameInput.value = '';
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const submitButton = document.querySelector(".btn.btn-primary");
+
+            if (submitButton) {
+                submitButton.addEventListener("click", function () {
+
+
+                    const submittedBy = document.getElementById("submitted-by")?.value.trim() || "";
+                    const network = document.getElementById("network")?.value.trim() || "";
+                    const os = document.getElementById("os")?.value.trim() || "";
+                    const adapter = document.getElementById("adapter")?.value.trim() || "";
+                    const division = document.getElementById("division")?.value.trim() || "";
+                    const user = document.getElementById("user")?.value.trim() || "";
+                    const yat = document.getElementById("yat")?.value.trim() || "";
+                    const office = document.getElementById("office")?.value.trim() || "";
+                    const phone = document.getElementById("phone")?.value.trim() || "";
+                    const make = document.getElementById("make")?.value.trim() || "";
+                    const model = document.getElementById("model")?.value.trim() || "";
+                    const pcSerial = document.getElementById("pc-serial")?.value.trim() || "";
+                    const netSerial = document.getElementById("net-serial")?.value.trim() || "";
+                    const hostName = document.getElementById("host-name")?.value.trim() || "";
+                    const mac = document.getElementById("mac")?.value.trim() || "";
+                    const ipv4 = document.getElementById("ipv4")?.value.trim() || "";
+                    const secseal = document.getElementById("secseal")?.value.trim() || "";
+                    const label = document.getElementById("label")?.value.trim() || "";
+
+                    const requestData = {};
+
+                    if (submittedBy) { requestData.created_by = submittedBy; }
+                    if (network) { requestData.network = network; }
+                    if (os) { requestData.os = os; }
+                    if (adapter) { requestData.network_adapter = adapter; }
+                    if (division) { requestData.office_location = division; }
+                    if (user) { requestData.user_name = user; }
+                    if (yat) { requestData.yat = yat; }
+                    if (office) { requestData.office_number = office; }
+                    if (phone) { requestData.telephone = phone; }
+                    if (make) { requestData.make = make; }
+                    if (model) { requestData.model = model; }
+                    if (pcSerial) { requestData.pc_serialnumber = pcSerial; }
+                    if (netSerial) { requestData.net_adapter_serialnumber = netSerial; }
+                    if (hostName) { requestData.host_name = hostName; }
+                    if (mac) { requestData.mac_address = mac; }
+                    if (ipv4) { requestData.ipv4_address = ipv4; }
+                    if (secseal) { requestData.secseal = secseal; }
+                    if (label) { requestData.uuid_label = label; }
+
+                    // 3. Clear out any old error states
+                    clearError([
+                        "submitted-by",
+                        "network",
+                        "os",
+                        "adapter",
+                        "division",
+                        "user",
+                        "yat",
+                        "office",
+                        "phone",
+                        "make",
+                        "model",
+                        "pc-serial",
+                        "net-serial",
+                        "host-name",
+                        "mac",
+                        "ipv4",
+                        "secseal",
+                        "label"
+                    ]);
+
+                    // 4. POST the JSON
+                    fetch("/api/v1/computers/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(requestData)
+                    })
+                        .then(async (response) => {
+                            // Attempt to parse the response as JSON
+                            let data;
+                            try {
+                                data = await response.json();
+                            } catch (err) {
+                                console.error("Could not parse JSON:", err);
+                                throw new Error("Failed to parse JSON");
+                            }
+
+                            // Check for 422 Validation Error
+                            if (response.status === 422 && data.detail && data.detail.json) {
+                                // data.detail.json has the form: { "descr": ["Length must be between 0 and 500."] }
+                                for (const fieldName in data.detail.json) {
+                                    const messages = data.detail.json[fieldName];
+                                    const firstMessage = Array.isArray(messages) ? messages[0] : messages;
+
+                                    console.log(fieldName, firstMessage);
+
+                                    setErrorMessage(fieldName, firstMessage);
+                                }
+                            }
+                            else if (response.status === 405 && data.result.elements) {
+                                for (const fieldName in data.result.elements) {
+                                    const messages = data.result.elements[fieldName];
+                                    const firstMessage = Array.isArray(messages) ? messages[0] : messages;
+
+                                    console.log(fieldName, firstMessage);
+
+                                    setErrorMessage(fieldName, firstMessage);
+                                }
+                            }
+                            else if (response.status === 403 && data.error) {
+                                window.location.href = `/403?message=${data.error.name}`;
+                            }
+                            else if (response.status === 200) {
+                                window.location.href = `/computers`
+                            }
+                        })
+                        .catch((err) => {
+                            console.error("Error submitting ticket:", err);
+                        });
+                });
+            }
+
+            /**
+             * Removes is-invalid from inputs and clears invalid-feedback text
+             * for the given array of field IDs
+             */
+            function clearError(fieldIds) {
+                fieldIds.forEach((id) => {
+                    const fieldEl = document.getElementById(id);
+                    const errorEl = document.getElementById(`${id}-error`);
+                    if (fieldEl) {
+                        fieldEl.classList.remove("is-invalid");
+                    }
+                    if (errorEl) {
+                        errorEl.textContent = "";
+                    }
+                });
+            }
+
+            /**
+             * Applies is-invalid to the matching field and sets the error text
+             * @param {string} fieldName - e.g. "created_by" (from server) or "office_number"
+             * @param {string} message   - e.g. "Missing data for required field."
+             */
+            function setErrorMessage(fieldName, message) {
+                // Map server field names to DOM element IDs if needed
+                let domId = fieldName;
+                if (fieldName === "office_number") domId = "office";
+                if (fieldName === "created_by") domId = "submitted-by";
+                if (fieldName === "mac_address") domId = "mac";
+                if (fieldName === "host_name") domId = "host-name";
+                if (fieldName === "network_adapter") domId = "adapter";
+                if (fieldName === "ipv4_address") domId = "ipv4";
+                if (fieldName === "uuid_label") domId = "label";
+
+                const fieldEl = document.getElementById(domId);
+                const errorEl = document.getElementById(`${domId}-error`);
+                if (fieldEl) {
+                    fieldEl.classList.add("is-invalid");
+                }
+                if (errorEl) {
+                    errorEl.textContent = message;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

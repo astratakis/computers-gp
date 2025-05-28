@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  {% include 'header.html' %}
+  <body>
+    <script src="{{url_for('static', filename='dist/js/demo-theme.min.js')}}"></script>
+    <div class="page">
+      <!-- Navbar -->
+      {% set active_page = 'jobs' %}
+      {% include 'navbar.html' %}
+      <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title">
+                  Open Jobs Today:
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body border-bottom py-3">
+                  <div class="d-flex align-items-center">
+                    <!-- Toggle switch for sorting -->
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="sortSwitch">
+                      <label class="form-check-label" for="sortSwitch" id="sortSwitchLabel">
+                        Sort by Date Created
+                      </label>
+                    </div>
+                    <!-- Show all history checkbox -->
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                      <label class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="chkShowAll">
+                        <span class="form-check-label">Show all history</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table card-table table-vcenter text-nowrap datatable">
+                    <thead>
+                      <tr>
+                        <th class="w-1">JOB ID</th>
+                        <th>Host name</th>
+                        <th>Created by</th>
+                        <th>Created at</th>
+                        <th>Signed by</th>
+                        <th>Signed at</th>
+                        <th>Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="jobsBody">
+                      <!-- The rows will be dynamically added by JavaScript -->
+                    </tbody>
+                  </table>
+                </div>                        
+                <div class="card-footer d-flex align-items-center">
+                  <p class="m-0 text-secondary">
+                    Showing <span id="rangeStart">0</span> to <span id="rangeEnd">0</span> of <span id="totalJobs">0</span> jobs
+                  </p>
+                  <ul class="pagination m-0 ms-auto">
+                    <!-- Pagination buttons -->
+                    <li class="page-item disabled" id="prevPage">
+                      <a class="page-link" href="#" id="prevBtn">
+                        <!-- SVG for left arrow -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" 
+                             width="24" height="24" viewBox="0 0 24 24" 
+                             stroke-width="2" stroke="currentColor" fill="none" 
+                             stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                          <path d="M15 6l-6 6l6 6" />
+                        </svg>
+                        prev
+                      </a>
+                    </li>
+                    <li class="page-item disabled" id="nextPage">
+                      <a class="page-link" href="#" id="nextBtn">
+                        next
+                        <!-- SVG for right arrow -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" 
+                             width="24" height="24" viewBox="0 0 24 24" 
+                             stroke-width="2" stroke="currentColor" fill="none" 
+                             stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                          <path d="M9 6l6 6l-6 6" />
+                        </svg>
+                      </a>
+                    </li>
+                  </ul>
+                </div>                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="jobModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Job Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p id="jobModalContent">Loading job details...</p>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+              Cancel
+            </a>
+            <button 
+              type="submit" 
+              class="btn btn-danger ms-auto" 
+              id="submitFinishedBtn" 
+              data-job-id=""
+            >
+              Submit Finished
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+
+    <!-- Libs JS -->
+    <script src="{{url_for('static', filename='dist/js/tabler.min.js')}}" defer></script>
+    <script src="{{url_for('static', filename='dist/js/demo.min.js')}}" defer></script>
+
+    <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // ... your existing code to fetch and render jobs ...
+
+        // Delegate event listener for dynamically added "View" buttons
+        document.addEventListener('click', function(event) {
+          const btn = event.target.closest('.view-job');
+          if (btn) {
+            // Get the job id (uuid) from the data attribute
+            const jobId = btn.getAttribute('data-job-id');
+            // Optionally, you can also get jobLabel if needed:
+            // const jobLabel = btn.getAttribute('data-job-label');
+            
+            // Set initial loading message in the modal
+            const modalContentEl = document.getElementById('jobModalContent');
+            modalContentEl.innerHTML = 'Loading policy details...';
+
+            // Send GET request to fetch policy details
+            fetch(`/api/v1/entries/policy/${jobId}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                // Assuming the policy data is returned under data.result.job
+                const policy = data.result.policy;
+                
+                // Create a nicely formatted list of policy details
+                const content = `
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>UUID Label:</span>
+                      <strong>${policy.uuid_label}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>Host Name:</span>
+                      <strong>${policy.host_name}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>MAC Address:</span>
+                      <strong>${policy.mac_address}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>IPv4 Address:</span>
+                      <strong>${policy.ipv4_address}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>User Name:</span>
+                      <strong>${policy.user_name || 'N/A'}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>Office Location:</span>
+                      <strong>${policy.office_location || 'N/A'}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>Telephone:</span>
+                      <strong>${policy.telephone || 'N/A'}</strong>
+                    </li>
+                  </ul>
+                `;
+
+                modalContentEl.innerHTML = content;
+              })
+              .catch(error => {
+                modalContentEl.textContent = 'Failed to load policy details.';
+                console.error('Error fetching policy details:', error);
+              });
+
+            const finishBtn = document.getElementById('submitFinishedBtn');
+            finishBtn.setAttribute('data-job-id', jobId);
+            
+            // Open the modal (assuming you're using Bootstrap 5)
+            const jobModal = new bootstrap.Modal(document.getElementById('jobModal'));
+            jobModal.show();
+          }
+        });
+        document.addEventListener('click', function(event) {
+          const finishBtn = event.target.closest('.btn-danger');
+          if (finishBtn) {
+            const jobId = finishBtn.getAttribute('data-job-id');
+
+            const role = "{{ role }}";
+
+            const currentUser = (role === 'Administrator') ? 'Administrator' : '{{ fullname }}';
+
+            // Send a PATCH request to mark the job as finished
+            fetch(`/api/v1/entries/${jobId}`, {
+              method: 'PATCH', // or 'POST' if your route requires
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                "status": 'closed',
+                "signed_by": currentUser
+              })
+            })
+            .then(response => {
+              if (response.status === 200) {
+                return response.json();
+              }
+              else if (response.status === 403) {
+                window.location.href = `/403?message=${data.error.name}`;
+              }
+              else {
+                throw new Error('Network response was not ok');
+              }
+            })
+            .then(data => {
+              if (data.success) {
+                // If the request was successful, close the modal
+                const jobModalEl = document.getElementById('jobModal');
+                const jobModalInstance = bootstrap.Modal.getInstance(jobModalEl);
+                jobModalInstance.hide();
+
+                // Redirect to /jobs
+                window.location.href = '/jobs';
+              } else {
+                alert('Failed to update entry. Please check logs.');
+              }
+            })
+            .catch(error => {
+              console.error('Error submitting finished job:', error);
+              alert('Failed to update the job.');
+            });
+          }
+        });
+      });
+    </script>
+
+    <!-- Custom JS logic for Jobs -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        
+        let offset = 0;
+        const limit = 8;
+        let totalJobs = 0;
+        let sortField = 'created_at';
+        let filter = 'recent';
+      
+        // Element references
+        const tableBody = document.querySelector('tbody');
+        const pageNumbers = document.querySelector('.pagination');
+        const showingInfo = document.querySelector('.card-footer p');
+      
+        // Button references (used for initial button styling)
+        const prevButton = document.querySelector('.page-item:first-child a');
+        const nextButton = document.querySelector('.page-item:last-child a');
+
+        const sortSwitch = document.getElementById('sortSwitch');
+        const sortSwitchLabel = document.getElementById('sortSwitchLabel');
+        const chkShowAll = document.getElementById('chkShowAll');
+
+        sortSwitch.addEventListener('change', function() {
+          if (this.checked) {
+            sortSwitchLabel.textContent = 'Sort by Date Signed';
+            sortField = 'signed_at';
+          } else {
+            sortSwitchLabel.textContent = 'Sort by Date Created';
+            sortField = 'created_at';
+          }
+          offset = 0;
+          fetchJobs();
+        });
+
+        chkShowAll.addEventListener('change', () => {
+          if (chkShowAll.checked) {
+            filter = 'all';
+          } else {
+            filter = 'recent';
+          }
+
+          offset = 0;
+          fetchTotalCount().then(() => {
+            fetchJobs();
+          });
+        });
+
+        async function fetchTotalCount() {
+          const url = `/api/v1/entries/jobs/count?filter=${filter}`;
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            totalJobs = data.result.count;
+            return data.result.count;
+          } catch (error) {
+            console.error('Error fetching total count:', error);
+            totalJobs = 0;
+            return 0;
+          }
+        }
+
+        async function fetchJobs() {
+          
+            const url = `/api/v1/entries/jobs?filter=${filter}&sort=${sortField}&limit=${limit}&offset=${offset}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.status === 200) {
+              tableBody.innerHTML = '';
+              updatePagination();
+              if (data.result.count > 0) {
+                data.result.jobs.forEach(job => {
+                  const row = document.createElement('tr');
+
+                  let statusMarkup = '';
+
+                  if (job.status.toLowerCase() === 'closed') {
+                    statusMarkup = `
+                      <span class="status-indicator status-green status-indicator-animated">
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                      </span>
+                    `;
+                  } else if (job.status.toLowerCase() === 'open' && job.reason === 'Registration') {
+                    statusMarkup = `
+                      <span class="status-indicator status-red status-indicator-animated">
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                      </span>
+                    `;
+                  } else if (job.status.toLowerCase() === 'open' && job.reason === 'Format') {
+                    statusMarkup = `
+                      <span class="status-indicator status-blue status-indicator-animated">
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                        <span class="status-indicator-circle"></span>
+                      </span>
+                    `;
+                  } else {
+                    // Fallback to displaying plain status text if none of the conditions match
+                    statusMarkup = job.status;
+                  }
+                  row.innerHTML = `
+                    <td class="text-reset">${job.uuid}</td>
+                    <td><a href="/computers/${job.uuid_label}">${job.host_name}</a></td>
+                    <td>${job.created_by}</td>
+                    <td>${job.created_at}</td>
+                    <td>${job.signed_by}</td>
+                    <td>${job.signed_at}</td>
+                    <td>${statusMarkup}</td>
+                    <td>
+                      <button class="btn btn-primary btn-sm view-job" data-job-id="${job.uuid}" data-job-label="${job.uuid_label}">
+                        View
+                      </button>
+                    </td>
+                  `;
+                  tableBody.appendChild(row);
+                });
+
+                showingInfo.innerHTML = `Showing ${offset + 1} to ${offset + data.result.count} of ${totalJobs} jobs`;
+              } else {
+                showingInfo.innerHTML = `Showing 0 to 0 of 0 jobs`;
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No jobs found</td></tr>';
+              }
+            }
+            else if (response.status === 403 && data.error) {
+              window.location.href = `/403?message=${data.error.name}`;
+            }
+            else {
+              throw new Error("Failed to fetch jobs");
+            }
+        }
+
+        function updatePagination() {
+          const currentPage = Math.floor(offset / limit) + 1;
+
+          if (prevButton && nextButton && pageNumbers) {
+            prevButton.parentElement.classList.toggle('disabled', offset === 0);
+            nextButton.parentElement.classList.toggle('disabled', offset + limit >= totalJobs);
+          }
+        }
+
+        nextButton.addEventListener('click', function (event) {
+          event.preventDefault();
+
+          if (offset + limit < totalJobs) {
+            offset += limit;
+          }
+
+          fetchJobs().then(() => {
+            updatePagination();
+          });
+        });
+
+        prevButton.addEventListener('click', function (event) {
+          event.preventDefault();
+
+          if (offset > 0) {
+            offset -= limit;
+          }
+          
+          fetchJobs().then(() => {
+            updatePagination();
+          });
+        });
+
+        fetchTotalCount().then(() => {
+          fetchJobs();
+        });
+
+      });
+    </script>
+  </body>
+</html>

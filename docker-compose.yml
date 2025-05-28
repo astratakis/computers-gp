@@ -1,0 +1,103 @@
+services:
+  configuration:
+    build:
+      context: ./keycloak-init-service
+    container_name: configuration
+    depends_on:
+      - postgres
+      - keycloak
+      - pgadmin
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_TOKEN_LIFESPAN: ${KEYCLOAK_TOKEN_LIFESPAN}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_REALM_ROLES: ${KEYCLOAK_REALM_ROLES}
+    volumes:
+      - ./keycloak-init-service:/usr/src
+      - ./.shared-data:/usr/shared
+    command: >
+      bash -c "/usr/src/wait-for-it.sh postgres:5432 --timeout=60 --strict &&
+              /usr/src/wait-for-it.sh keycloak:9000 --timeout=60 --strict &&
+              /usr/src/wait-for-it.sh pgadmin:80 --timeout=60 --strict &&
+              python3 /usr/src/configure-keycloak.py"
+
+  postgres:
+    image: docker.io/library/postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      KEYCLOAK_DB_USER: ${KC_DB_USERNAME}
+      KEYCLOAK_DB_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - /home/postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: keycloak
+    depends_on:
+      - postgres
+    environment:
+      KC_HEALTH_ENABLED: ${KC_HEALTH_ENABLED}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: ${KC_DB}
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_RELATIVE_HTTP_PATH: ${KC_RELATIVE_HTTP_PATH}
+      KC_HOSTNAME_DEBUG: ${KC_HOSTNAME_DEBUG}
+      KC_HOSTNAME_STRICT: ${KC_HOSTNAME_STRICT}
+      KC_HTTP_ENABLED: ${KC_HTTP_ENABLED}
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      JDBC_PARAMS: ${JDBC_PARAMS}
+    command: start
+ 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      SCRIPT_NAME: ${SCRIPT_NAME}
+
+  flask:
+    build:
+        context: ./app
+    container_name: flask
+    depends_on:
+      - postgres
+    volumes:
+      - ./app:/usr/app
+      - ./.shared-data:/usr/shared
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      FLASK_APP: ${FLASK_APP}
+      FLASK_DEBUG: ${FLASK_DEBUG}
+      PYTHONPATH: ${PYTHONPATH}
+    command: >
+      bash -c "flask run --host=0.0.0.0 --port=80"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
+      - ./certs/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    command: ["nginx", "-g", "daemon off;"]

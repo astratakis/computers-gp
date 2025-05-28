@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+{% include 'header.html' %}
+
+<body>
+  <script src="{{url_for('static', filename='dist/js/demo-theme.min.js')}}"></script>
+  <div class="page">
+    <!-- Navbar -->
+    {% set active_page = 'computers' %}
+    {% include 'navbar.html' %}
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title">
+                Computers Database
+              </h2>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a href="/computers/new" class="btn btn-primary d-none d-sm-inline-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 5l0 14" />
+                    <path d="M5 12l14 0" />
+                  </svg>
+                  Create new registration
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body border-bottom py-3">
+                <div class="d-flex">
+                  <div class="ms-auto text-secondary">
+                    Search:
+                    <div class="ms-2 d-inline-block">
+                      <input type="text" class="form-control form-control-sm" aria-label="Search invoice"
+                        id="searchInput">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table card-table table-vcenter text-nowrap datatable">
+                  <thead>
+                    <tr>
+                      <th class="w-1">Label.
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24"
+                          viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M6 15l6 -6l6 6" />
+                        </svg>
+                      </th>
+                      <th>Host name</th>
+                      <th>Mac address</th>
+                      <th>Ip address</th>
+                      <th>Sec seal</th>
+                      <th>Net Bridge</th>
+                      <th>Serialnumber</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- The rows will be dynamically added by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer d-flex align-items-center">
+                <p class="m-0 text-secondary">Showing <span>0</span> to <span>0</span> of <span>0</span> computers</p>
+                <ul class="pagination m-0 ms-auto">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-disabled="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M15 6l-6 6l6 6" />
+                      </svg>
+                      prev
+                    </a>
+                  </li>
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-disabled="true">
+                      next
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M9 6l6 6l-6 6" />
+                      </svg>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tabler Core -->
+  <script src="{{url_for('static', filename='dist/js/tabler.min.js')}}" defer></script>
+  <script src="{{url_for('static', filename='dist/js/demo.min.js')}}" defer></script>
+
+  <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+  <script src="{{url_for('static', filename='custom-js/fetch-computers.js')}}" defer></script>
+
+</body>
+
+</html>

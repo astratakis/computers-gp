@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+{% include 'header.html' %}
+
+<body>
+  <!-- JavaScript for Theme -->
+  <script src="{{ url_for('static', filename='dist/js/demo-theme.min.js') }}"></script>
+
+  <div class="page">
+    <!-- Navbar -->
+    {% include 'navbar.html' %}
+
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <!-- Ticket title will go here -->
+              <h2 class="page-title fw-bold" id="title">...</h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <!-- Dropdown for status selection -->
+                <span class="d-none d-sm-inline">
+                  <select class="form-select" id="status-select">
+                    <option value="open">Open</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="awaiting">Awaiting Reply</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </span>
+
+                <!-- Save button -->
+                <span class="d-none d-sm-inline">
+                  <a href="#" class="btn btn-light w-100" id="save-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                      stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M11.35 17.39l-4.35 2.61v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v6" />
+                      <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
+                    </svg>
+                    Save
+                  </a>
+                </span>
+
+                <!-- Delete button -->
+                <span class="d-none d-sm-inline">
+                  <a href="#" class="btn btn-danger w-100" id="delete-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                      stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M4 7l16 0" />
+                      <path d="M10 11l0 6" />
+                      <path d="M14 11l0 6" />
+                      <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                      <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                    </svg>
+                    Delete
+                  </a>
+                </span>
+              </div>
+            </div>
+
+
+            <hr class="hr my-2" />
+
+            <div class="page-title d-flex justify-content-between align-items-center">
+              <span id="submitted-by"></span>
+              <span class="d-none d-sm-inline" id="status"></span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+
+          <div class="card">
+            <form id="ticket-form">
+              <div class="card-body">
+
+                <!-- Row 1: client name, division, office, phone, priority -->
+                <div class="mb-3">
+                  <div class="row g-2">
+
+                    <!-- Client Name -->
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Client name</label>
+                        <input type="text" id="client-name" name="client_name" class="form-control">
+                        <small id="client-name-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Division -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Division</label>
+                        <input type="text" id="division" class="form-control">
+                        <small id="division-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Office -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Office</label>
+                        <input type="text" id="office" class="form-control">
+                        <small id="office-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="phone" class="form-control">
+                        <small id="phone-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="priority" class="form-select">
+                          <option value="" selected disabled hidden>Set priority</option>
+                          <option value="1">Very high</option>
+                          <option value="2">High</option>
+                          <option value="3">Normal</option>
+                          <option value="4">Low</option>
+                        </select>
+                        <small id="priority-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description (TinyMCE) -->
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <!-- If you're using TinyMCE, just wrap the <textarea> in a normal <form> or specify which editor to target in JS. -->
+                  <textarea id="tinymce-mytextarea"></textarea>
+                  <small id="tinymce-mytextarea-error" class="invalid-feedback"></small>
+                </div>
+
+              </div> <!-- card-body -->
+            </form>
+          </div> <!-- card -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Libraries -->
+  <!-- Libs JS -->
+  <script src="{{ url_for('static', filename='dist/libs/tinymce/tinymce.min.js') }}" defer></script>
+
+  <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+  <!-- Tabler Core -->
+  <script src="{{ url_for('static', filename='dist/js/tabler.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='dist/js/demo.min.js') }}" defer></script>
+
+  <script>
+    // Function to fetch and populate ticket data
+    async function fetchTicketData() {
+      try {
+        // 1. Parse the ticket ID from the URL (assuming route is /tickets/<id>)
+        const pathParts = window.location.pathname.split('/');
+        const ticketId = pathParts[pathParts.length - 1];
+
+        // 2. Fetch the ticket data from your API endpoint
+        const response = await fetch(`/api/v1/tickets/${ticketId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch ticket');
+        }
+        const data = await response.json();
+
+        // 3. Populate the fields
+        // Update title
+        document.getElementById('title').textContent = data.result.ticket.title || 'No Title';
+
+        // Update submitted-by and status fields
+        const createdBy = data.result.ticket.created_by || '';
+        const createdAt = data.result.ticket.created_at || '';
+        const ticketStatus = data.result.ticket.status || '';
+
+        let statusMarkup;
+        switch (ticketStatus) {
+          case 'open':
+            statusMarkup = `<span class="badge text-white bg-purple">Open</span>`;
+            break;
+          case 'in-progress':
+            statusMarkup = `<span class="badge text-white bg-blue">In Progress</span>`;
+            break;
+          case 'awaiting':
+            statusMarkup = `<span class="badge text-white bg-teal">Awaiting Reply</span>`;
+            break;
+          case 'closed':
+            statusMarkup = `<span class="badge text-white bg-red">Closed</span>`;
+            break;
+          default:
+            statusMarkup = `<span class="badge bg-secondary">Unknown</span>`;
+        }
+
+        document.getElementById('submitted-by').textContent = `${createdBy} (${createdAt})`;
+        document.getElementById('status').innerHTML = statusMarkup;
+
+        // Populate other form fields
+        document.getElementById('client-name').value = data.result.ticket.client_name || '';
+        document.getElementById('division').value = data.result.ticket.division || '';
+        document.getElementById('office').value = data.result.ticket.office_number || '';
+        document.getElementById('phone').value = data.result.ticket.phone || '';
+        document.getElementById('priority').value = data.result.ticket.priority || '';
+
+        // Set TinyMCE content (editor is ready by this point)
+        const description = data.result.ticket.descr || '';
+        tinyMCE.get('tinymce-mytextarea').setContent(description);
+
+        // Set the default selection of the dropdown to the current ticket status
+        const statusSelect = document.getElementById('status-select');
+        if (statusSelect) {
+          for (let option of statusSelect.options) {
+            if (option.value === data.result.ticket.status) {
+              option.selected = true;
+              break;
+            }
+          }
+        }
+
+      } catch (error) {
+        console.error('Error loading ticket:', error);
+        // Optionally handle the error (e.g., show a message to the user)
+      }
+    }
+
+    // Setup TinyMCE when the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      let options = {
+        selector: '#tinymce-mytextarea',
+        height: 300,
+        menubar: false,
+        statusbar: false,
+        entity_encoding: 'raw',
+        toolbar: 'undo redo | formatselect | ' +
+          'bold italic backcolor | alignleft aligncenter ' +
+          'alignright alignjustify | bullist numlist outdent indent | ' +
+          'removeformat',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+        // This callback is executed once the TinyMCE editor instance is fully initialized.
+        init_instance_callback: function (editor) {
+          fetchTicketData();
+        }
+      };
+
+      // Check for dark mode settings if applicable
+      if (localStorage.getItem("tablerTheme") === 'dark') {
+        options.skin = 'oxide-dark';
+        options.content_css = 'dark';
+      }
+
+      // Initialize TinyMCE with the specified options
+      tinyMCE.init(options);
+    });
+  </script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const deleteButton = document.getElementById('delete-button');
+
+      deleteButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        // 1. Confirm deletion with the user
+        const confirmed = confirm('Are you sure you want to delete this ticket?');
+        if (!confirmed) return;
+
+        // 2. Parse the ticket ID from the URL path
+        const pathParts = window.location.pathname.split('/');
+        const ticketId = pathParts[pathParts.length - 1];
+
+        try {
+          // 3. Send DELETE request
+          const response = await fetch(`/api/v1/tickets/${ticketId}`, {
+            method: 'DELETE'
+          });
+
+          if (!response.ok) {
+            // If server responds with an error (4xx or 5xx), throw
+            throw new Error('Failed to delete ticket');
+          }
+
+          // 4. Redirect or refresh the page (here we go back to /tickets)
+          window.location.href = '/tickets';
+
+        } catch (err) {
+          console.error('Error deleting ticket:', err);
+          alert('An error occurred while deleting the ticket.');
+        }
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveButton = document.getElementById('save-button');
+
+      saveButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        // 1. Parse the ticket ID from the URL
+        const pathParts = window.location.pathname.split('/');
+        const ticketId = pathParts[pathParts.length - 1];
+
+        // 2. Gather updated data from the form
+        const clientName = document.getElementById('client-name').value;
+        const division = document.getElementById('division').value;
+        const office = document.getElementById('office').value;
+        const phone = document.getElementById('phone').value;
+        const priority = document.getElementById('priority').value;
+        const status = document.getElementById('status-select').value;
+        // If using TinyMCE:
+        const description = window.tinyMCE?.get('tinymce-mytextarea')
+          ? window.tinyMCE.get('tinymce-mytextarea').getContent()
+          : document.getElementById('tinymce-mytextarea').value; // fallback if TinyMCE not loaded
+
+        // 3. Create the object to send (only fields you want to patch)
+        const requestData = {};
+        if (clientName) { requestData.client_name = clientName; }
+        if (division) { requestData.division = division; }
+        if (office) { requestData.office_number = office; }
+        if (phone) { requestData.phone = phone; }
+        if (priority) { requestData.priority = priority; }
+        if (description) { requestData.descr = description; }
+        if (status) { requestData.status = status; }
+
+        try {
+          // 4. Send the PATCH request
+          const response = await fetch(`/api/v1/tickets/${ticketId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          if (!response.ok) {
+            // If the server returns an error (4xx or 5xx), throw
+            throw new Error('Server returned an error while updating');
+          }
+
+          // 5. On success, redirect back to /tickets/<id>
+          // (which effectively reloads the updated ticket)
+          window.location.href = `/tickets/${ticketId}`;
+
+        } catch (error) {
+          console.error('Error saving ticket:', error);
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

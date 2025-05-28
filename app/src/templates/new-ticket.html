@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+{% include 'header.html' %}
+
+<body>
+  <script src="{{ url_for('static', filename='dist/js/demo-theme.min.js') }}"></script>
+  <div class="page">
+    <!-- Navbar -->
+    {% set active_page = 'tickets' %}
+    {% include 'navbar.html' %}
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title">
+                New Ticket
+              </h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a class="btn btn-primary d-none d-sm-inline-block">
+                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 5l0 14" />
+                    <path d="M5 12l14 0" />
+                  </svg>
+                  Submit
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="card">
+            <form id="ticket-form">
+              <div class="card-body">
+
+                <!-- Row 1: client name, division, office, phone, priority -->
+                <div class="mb-3">
+                  <div class="row g-2">
+
+                    <!-- Client Name -->
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Client name</label>
+                        <input type="text" id="client-name" name="client_name" class="form-control">
+                        <!-- Error placeholder -->
+                        <small id="client-name-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Division -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Division</label>
+                        <input type="text" id="division" class="form-control">
+                        <small id="division-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Office -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Office</label>
+                        <input type="text" id="office" class="form-control">
+                        <small id="office-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="phone" class="form-control">
+                        <small id="phone-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="col-md-2">
+                      <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="priority" class="form-select">
+                          <option value="" selected disabled hidden aria-required="true">Set priority</option>
+                          <option value="1">Very high</option>
+                          <option value="2">High</option>
+                          <option value="3">Normal</option>
+                          <option value="4">Low</option>
+                        </select>
+                        <small id="priority-error" class="invalid-feedback"></small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Row 2: title, submitted by -->
+                  <div class="row g-2">
+                    <div class="col-md-8">
+                      <label class="form-label">Title</label>
+                      <input type="text" id="title" class="form-control" />
+                      <small id="title-error" class="invalid-feedback"></small>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Submitted by</label>
+                      <select id="submitted-by" class="form-select">
+                        <option value="" selected disabled hidden aria-required="true">Select your name</option>
+                        {% for operator in operators %}
+                        <option value="{{ operator.name }}">{{ operator.name }}</option>
+                        {% endfor %}
+                      </select>
+                      <small id="submitted-by-error" class="invalid-feedback"></small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description (TinyMCE) -->
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <form method="post">
+                    <textarea id="tinymce-mytextarea"></textarea>
+                  </form>
+                  <small id="tinymce-mytextarea-error" class="invalid-feedback"></small>
+                </div>
+
+              </div> <!-- card-body -->
+            </form>
+          </div> <!-- card -->
+        </div> <!-- container-xl -->
+      </div> <!-- page-body -->
+    </div> <!-- page-wrapper -->
+  </div> <!-- page -->
+
+  <!-- Libs JS -->
+  <script src="{{ url_for('static', filename='dist/libs/tinymce/tinymce.min.js') }}" defer></script>
+
+  <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+  <!-- Tabler Core -->
+  <script src="{{ url_for('static', filename='dist/js/tabler.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='dist/js/demo.min.js') }}" defer></script>
+
+  <script>
+    // Setup TinyMCE
+    document.addEventListener("DOMContentLoaded", function () {
+      let options = {
+        selector: '#tinymce-mytextarea',
+        height: 300,
+        menubar: false,
+        statusbar: false,
+        entity_encoding: 'raw',
+        toolbar: 'undo redo | formatselect | ' +
+          'bold italic backcolor | alignleft aligncenter ' +
+          'alignright alignjustify | bullist numlist outdent indent | ' +
+          'removeformat',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }'
+      };
+      // If Tabler is in dark mode
+      if (localStorage.getItem("tablerTheme") === 'dark') {
+        options.skin = 'oxide-dark';
+        options.content_css = 'dark';
+      }
+      tinyMCE.init(options);
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const submitButton = document.querySelector(".btn.btn-primary");
+
+      if (submitButton) {
+        submitButton.addEventListener("click", function () {
+          // 1. Gather form data
+          const clientName = document.getElementById("client-name")?.value.trim() || "";
+          const division = document.getElementById("division")?.value.trim() || "";
+          const office = document.getElementById("office")?.value.trim() || "";
+          const phone = document.getElementById("phone")?.value.trim() || "";
+          const priority = document.getElementById("priority")?.value.trim() || "";
+          const title = document.getElementById("title")?.value.trim() || "";
+          const submittedBy = document.getElementById("submitted-by")?.value.trim() || "";
+          const description = tinymce.get("tinymce-mytextarea").getContent()?.trim() || "";
+
+          // 2. Build JSON with only non-empty fields
+          const requestData = {};
+          if (clientName) { requestData.client_name = clientName; }
+          if (division) { requestData.division = division; }
+          if (office) { requestData.office_number = office; }
+          if (phone) { requestData.phone = phone; }
+          if (priority) { requestData.priority = priority; }
+          if (title) { requestData.title = title; }
+          if (submittedBy) { requestData.created_by = submittedBy; }
+          if (description) { requestData.descr = description; }
+
+          // 3. Clear out any old error states
+          clearError([
+            "client-name", "division", "office", "phone", "priority", "title", "submitted-by", "tinymce-mytextarea"
+          ]);
+
+          // 4. POST the JSON
+          fetch("/api/v1/tickets/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestData)
+          })
+            .then(async (response) => {
+              // Attempt to parse the response as JSON
+              let data;
+              try {
+                data = await response.json();
+              } catch (err) {
+                console.error("Could not parse JSON:", err);
+                throw new Error("Failed to parse JSON");
+              }
+
+              // Check for 422 Validation Error
+              if (response.status === 422 && data.detail && data.detail.json) {
+                // data.detail.json has the form: { "descr": ["Length must be between 0 and 500."] }
+                for (const fieldName in data.detail.json) {
+                  const messages = data.detail.json[fieldName];
+                  const firstMessage = Array.isArray(messages) ? messages[0] : messages;
+
+                  setErrorMessage(fieldName, firstMessage);
+                }
+              }
+              else if (response.status === 403 && data.error) {
+                // Example: redirect for unauthorized
+                window.location.href = `/403?message=${data.error.name}`;
+              }
+              else if (response.status === 200) {
+                window.location.href = `/tickets`
+              }
+            })
+            .catch((err) => {
+              console.error("Error submitting ticket:", err);
+            });
+        });
+      }
+
+      /**
+       * Removes is-invalid from inputs and clears invalid-feedback text
+       * for the given array of field IDs
+       */
+      function clearError(fieldIds) {
+        fieldIds.forEach((id) => {
+          const fieldEl = document.getElementById(id);
+          const errorEl = document.getElementById(`${id}-error`);
+          if (fieldEl) {
+            fieldEl.classList.remove("is-invalid");
+          }
+          if (errorEl) {
+            errorEl.textContent = "";
+          }
+        });
+      }
+
+      /**
+       * Applies is-invalid to the matching field and sets the error text
+       * @param {string} fieldName - e.g. "created_by" (from server) or "office_number"
+       * @param {string} message   - e.g. "Missing data for required field."
+       */
+      function setErrorMessage(fieldName, message) {
+        // Map server field names to DOM element IDs if needed
+        let domId = fieldName;
+        if (fieldName === "office_number") domId = "office";
+        if (fieldName === "created_by") domId = "submitted-by";
+        // The server calls it 'descr'. We map that to our TinyMCE field id:
+        if (fieldName === "descr") domId = "tinymce-mytextarea";
+
+        // For normal inputs:
+        if (domId !== "tinymce-mytextarea") {
+          const fieldEl = document.getElementById(domId);
+          const errorEl = document.getElementById(`${domId}-error`);
+          if (fieldEl) {
+            fieldEl.classList.add("is-invalid");
+          }
+          if (errorEl) {
+            errorEl.textContent = message;
+          }
+        }
+        // For TinyMCE:
+        else {
+          const editor = tinymce.get("tinymce-mytextarea");
+          if (editor) {
+            // The main .tox-editor container
+            const editorContainer = editor.getContainer();
+            editorContainer.classList.add("is-invalid");
+          }
+          // Show message in <small id="tinymce-mytextarea-error">
+          const errorEl = document.getElementById("tinymce-mytextarea-error");
+          if (errorEl) {
+            errorEl.textContent = message;
+          }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

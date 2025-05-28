@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <style>
+      .icon-dark-mode {
+        width: 20px;
+        height: 20px;
+      }
+    
+      @media (prefers-color-scheme: dark) {
+        .icon-dark-mode {
+          filter: invert(1);
+        }
+      }
+    </style>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Computers GP</title>
+    
+    <!-- CSS files -->
+    <link href="{{url_for('static', filename='dist/css/tabler.min.css')}}" rel="stylesheet"/>
+    <link href="{{url_for('static', filename='dist/css/demo.min.css')}}" rel="stylesheet"/>
+    
+    <style>
+      :root {
+        --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+      }
+      body {
+        font-feature-settings: "cv03", "cv04", "cv11";
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- JavaScript for Theme -->
+    <script src="{{url_for('static', filename='dist/js/demo-theme.min.js')}}"></script>
+
+    <div class="page">
+      <!-- Navbar -->
+      {% include 'navbar.html' %}
+      
+      <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title" id="hostname">Loading...</h2>
+              </div>
+              <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                  <span class="d-none d-sm-inline">
+                    <a href="#" class="btn btn-light w-100" id="editButton">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                           stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M11.35 17.39l-4.35 2.61v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v6" />
+                        <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
+                      </svg>
+                      Edit
+                    </a>
+                  </span>
+                  <span class="d-none d-sm-inline">
+                    <a href="#" class="btn btn-danger w-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                      Delete
+                    </a>
+                  </span>
+                </div>
+              </div>
+              <div class="page-pretitle" id="uuid_label">
+                -
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Computer info</h3>
+              </div>
+              <div class="card-body">
+                <div class="datagrid">
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">IPv4 Address</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">MAC Address</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Make</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Model</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">PC Serial Number</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Network</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Network Adapter</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Network Adapter Serial Number</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">Operating System</div>
+                    <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Security Seal</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">User</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">YAT</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Subdivision</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Office Number</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                  <div class="datagrid-item">
+                      <div class="datagrid-title">Telephone</div>
+                      <div class="datagrid-content">Loading...</div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table card-table table-vcenter text-nowrap datatable">
+                  <thead>
+                    <tr>
+                      <th class="w-1">ID
+                      </th>
+                      <th>Operator</th>
+                      <th>Date Created</th>
+                      <th>Type</th>
+                      <th>Signed by</th>
+                      <th>Date signed</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- The rows will be dynamically added by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- External JS Libraries -->
+    <script src="{{url_for('static', filename='dist/js/tabler.min.js')}}" defer></script>
+    <script src="{{url_for('static', filename='dist/js/demo.min.js')}}" defer></script>
+
+    <script src="{{url_for('static', filename='custom-js/logout.js')}}" defer></script>
+
+    <script src="{{url_for('static', filename='custom-js/computer-datagrid.js')}}" defer></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const deleteButton = document.querySelector(".btn-danger");
+
+        if (deleteButton) {
+          deleteButton.addEventListener("click", async function (event) {
+            event.preventDefault();
+
+            // Show confirmation prompt
+            const userConfirmed = window.confirm(
+              "Are you sure you want to remove this computer?"
+            );
+            if (!userConfirmed) {
+              return; // If user clicks "Cancel", do nothing and exit
+            }
+
+            // Extract label from the URL
+            const pathSegments = window.location.pathname.split("/");
+            const label = pathSegments[pathSegments.indexOf("computers") + 1];
+
+            if (!label) {
+              alert("Error: Could not determine the computer label.");
+              return;
+            }
+
+            // Send DELETE request
+            try {
+              const response = await fetch(`/api/v1/computers/${label}`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (response.ok) {
+                window.location.href = "/computers"; // Redirect or update UI
+              } else {
+                alert("Failed to delete computer.");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred.");
+            }
+          });
+        }
+      });
+
+    </script>
+    <script>
+      document
+      .getElementById("editButton")
+      .addEventListener("click", function (event) {
+        event.preventDefault();
+        // Extract the uuid_label from the current URL.
+        // Assuming the current URL is in the format /computers/<uuid_label>
+        const pathParts = window.location.pathname.split("/");
+        const uuidLabel = pathParts[pathParts.length - 1];
+        // Redirect to the edit page
+        window.location.href = `/computers/edit/${uuidLabel}`;
+      });
+
+    </script>
+
+  </body>
+</html>
