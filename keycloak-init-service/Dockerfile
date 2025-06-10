@@ -1,5 +1,5 @@
 # Python image for Service keycloak-init
-FROM python:3.13-alpine
+FROM python:3.13-slim
 
 # Working directory
 WORKDIR /app
