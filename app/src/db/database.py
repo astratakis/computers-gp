@@ -7,7 +7,7 @@ import re
 
 import logging
 
-DATABASE_URL = "postgresql+psycopg2://user:password@192.168.199.99:5432/masterdatabase"
+DATABASE_URL = "postgresql+psycopg2://user:password@postgres:5432/masterdatabase"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
