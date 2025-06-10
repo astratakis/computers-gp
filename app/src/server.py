@@ -3,7 +3,6 @@ import requests
 import json
 import re
 import sys
-import psycopg2
 import os
 import uuid
 import os
@@ -15,7 +14,6 @@ from requests.models import Response
 import logging
 from auth import auth, security_doc, token_active
 
-from psycopg2.extras import RealDictCursor
 from flask import request, jsonify, current_app, redirect, session, url_for
 from apiflask import APIFlask
 from apiflask.fields import Dict, Nested
